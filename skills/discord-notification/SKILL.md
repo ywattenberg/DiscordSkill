@@ -30,6 +30,8 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
 - **With `--wait`**: When you need human input, approval, or a decision before continuing. The bot will block until the user replies in the Discord channel or the timeout expires.
 - **Without `--wait`** (fire-and-forget): For status updates, progress reports, or completion notifications where no reply is needed.
 
+**IMPORTANT**: When using `--wait`, you MUST set the Bash tool timeout to 600000 (10 minutes, the maximum). The `--timeout` flag controls how long the bot waits for a Discord reply, but the Bash execution timeout must be at least as long or the command will be killed before a reply arrives. Set `--timeout 86400` (1 day) for the bot and always use `timeout: 600000` on the Bash tool call.
+
 ## Parsing the response
 
 The script outputs a single JSON object to stdout:

@@ -22,6 +22,8 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
 
 If the user included flags like `--wait`, `--title`, `--fields`, or `--timeout` in their arguments, pass them through directly.
 
+**IMPORTANT**: When using `--wait`, always set the Bash tool timeout to 600000 (the maximum) so the command is not killed before a reply arrives.
+
 3. Parse the JSON output and present the result to the user:
    - On success: confirm the message was sent and show the message ID
    - If a response was received: show the responder and their message

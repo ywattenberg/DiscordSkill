@@ -87,6 +87,8 @@ async def send_notification(config: BotConfig, request: NotifyRequest) -> Notify
             await client.close()
 
     await client.start(config.bot_token)
+    # Allow aiohttp connector to finalize cleanup
+    await asyncio.sleep(0.25)
     return await result_future
 
 
