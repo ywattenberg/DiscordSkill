@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+uv.lock
+
+# Discord skill local config (contains secrets)
+.claude/*.local.md
