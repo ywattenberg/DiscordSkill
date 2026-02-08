@@ -1,19 +1,15 @@
 ---
-description: "Clear conversation context and run a command"
+description: "Run a command in a fresh context (forked subagent)"
 allowed-tools: Bash, Read
 argument-hint: <command>
+context: fork
+agent: general-purpose
 ---
 
 # Clear and Run
 
-Clear the conversation context, then invoke another slash command.
+You are running in a **fresh, isolated context** with no prior conversation history.
 
-## Steps
+If `$ARGUMENTS` is not empty, immediately use the Skill tool to invoke `discord-skill:$ARGUMENTS`.
 
-1. Tell the user you are about to clear context and run `/$ARGUMENTS` (or just clear context if no argument was provided).
-
-2. Invoke the built-in `/clear` command to reset conversation history.
-
-3. After context is cleared:
-   - If an argument was provided, immediately invoke `/$ARGUMENTS` as a slash command.
-   - If no argument was provided, confirm to the user that context has been reset.
+If `$ARGUMENTS` is empty, tell the user: "Context forked. Ready for instructions."
