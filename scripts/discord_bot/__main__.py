@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
 
 from discord_bot.client import parse_config, send_notification
 from discord_bot.models import EmbedField, NotifyRequest, NotifyResponse
@@ -42,6 +43,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=300,
         help="Wait timeout in seconds (default: 300)",
     )
+    parser.add_argument(
+        "--file",
+        action="append",
+        default=[],
+        dest="files",
+        help="Path to a file to attach (can be repeated)",
+    )
     return parser
 
 
@@ -77,11 +85,19 @@ def main() -> None:
             print(resp.model_dump_json())
             sys.exit(1)
 
+    # Validate file paths
+    for file_path in args.files:
+        if not Path(file_path).is_file():
+            resp = NotifyResponse(success=False, error=f"File not found: {file_path}")
+            print(resp.model_dump_json())
+            sys.exit(1)
+
     request = NotifyRequest(
         title=args.title,
         message=args.message,
         color=color,
         fields=fields,
+        files=args.files,
         wait=args.wait,
         timeout=args.timeout,
     )

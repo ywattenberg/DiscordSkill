@@ -24,6 +24,7 @@ class TestNotifyRequest:
         assert req.message == "hello"
         assert req.color == 0x5865F2
         assert req.fields == []
+        assert req.files == []
         assert req.wait is False
         assert req.timeout == 300
 
@@ -51,6 +52,24 @@ class TestNotifyRequest:
         data = json.loads(req.model_dump_json())
         req2 = NotifyRequest(**data)
         assert req == req2
+
+    def test_files_default_empty(self) -> None:
+        req = NotifyRequest(message="hello")
+        assert req.files == []
+
+    def test_files_with_paths(self) -> None:
+        req = NotifyRequest(message="hello", files=["/tmp/a.txt", "/tmp/b.log"])
+        assert req.files == ["/tmp/a.txt", "/tmp/b.log"]
+
+    def test_serialization_roundtrip_with_files(self) -> None:
+        req = NotifyRequest(
+            message="test",
+            files=["/tmp/report.txt", "/tmp/screenshot.png"],
+        )
+        data = json.loads(req.model_dump_json())
+        req2 = NotifyRequest(**data)
+        assert req == req2
+        assert req2.files == ["/tmp/report.txt", "/tmp/screenshot.png"]
 
 
 class TestNotifyResponse:
