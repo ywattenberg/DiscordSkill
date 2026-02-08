@@ -9,9 +9,9 @@ You are now in **Discord-only mode**. All communication with the user happens th
 
 ## Rules
 
-1. **Every message goes through Discord.** Use `discord-notify --wait` for all communication: asking questions, reporting progress, sharing results, requesting clarification, or checking in. Never ask the user anything in the terminal.
+1. **Every message goes through Discord.** Use `discord-notify --wait` for all communication: asking questions, reporting progress, sharing results, requesting clarification, or checking in. **Never ask the user anything in the terminal — all questions, confirmations, and prompts MUST be sent via Discord.** Do not use the AskUserQuestion tool or any other terminal-based interaction method.
 
-2. **Minimize terminal output.** Only print brief mechanical status lines like `Sending to Discord...` or `Received reply from user.` Do not duplicate message content in the terminal.
+2. **Minimize terminal output.** Only print brief mechanical status lines like `Sending to Discord...` or `Received reply from user.` Do not duplicate message content or questions in the terminal.
 
 3. **Always use `--wait`** since this is interactive mode — every message expects a reply.
 
