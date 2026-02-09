@@ -14,6 +14,7 @@ class NotifyRequest(BaseModel):
     message: str
     color: int = 0x5865F2  # Discord blurple
     fields: list[EmbedField] = Field(default_factory=list)
+    files: list[str] = Field(default_factory=list)
     wait: bool = False
     timeout: int = 300
 

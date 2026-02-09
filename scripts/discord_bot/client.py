@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from pathlib import Path
 
 import discord
 
 from discord_bot.models import NotifyRequest, NotifyResponse
+
+MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 MB Discord limit
 
 
 @dataclass
@@ -46,7 +49,29 @@ async def send_notification(config: BotConfig, request: NotifyRequest) -> Notify
             for field in request.fields:
                 embed.add_field(name=field.name, value=field.value, inline=field.inline)
 
-            sent = await channel.send(embed=embed)
+            # Validate file attachments
+            for file_path in request.files:
+                p = Path(file_path)
+                if not p.is_file():
+                    result_future.set_result(
+                        NotifyResponse(success=False, error=f"File not found: {file_path}")
+                    )
+                    await client.close()
+                    return
+                if p.stat().st_size > MAX_FILE_SIZE:
+                    result_future.set_result(
+                        NotifyResponse(
+                            success=False,
+                            error=f"File exceeds 25MB limit: {file_path}",
+                        )
+                    )
+                    await client.close()
+                    return
+
+            # Build discord.File objects after all validation passes
+            discord_files = [discord.File(fp) for fp in request.files]
+
+            sent = await channel.send(embed=embed, files=discord_files)
 
             if not request.wait:
                 result_future.set_result(NotifyResponse(success=True, message_id=sent.id))

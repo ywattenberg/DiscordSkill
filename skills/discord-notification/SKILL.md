@@ -21,6 +21,7 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
   [--title "Optional Title"] \
   [--color "#5865F2"] \
   [--fields '[{"name": "Field", "value": "Value", "inline": true}]'] \
+  [--file /path/to/file] \
   [--wait] \
   [--timeout 300]
 ```
@@ -68,6 +69,15 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
   --color "#FEE75C" \
   --wait \
   --timeout 600
+```
+
+### Send with file attachments
+```bash
+uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
+  --title "Build Artifacts" \
+  --message "Here are the build logs and test report." \
+  --file /tmp/build.log \
+  --file /tmp/test-report.html
 ```
 
 ### Report with fields

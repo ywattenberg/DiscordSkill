@@ -7,6 +7,7 @@ Use it to reach out via Discord during long-running tasks, ask for approval or i
 ## Features
 
 - Rich embed notifications (title, description, color, fields)
+- File attachments (up to 25MB each, multiple supported)
 - Fire-and-forget status updates
 - Blocking wait for human reply with configurable timeout
 - Structured JSON output
@@ -27,7 +28,7 @@ Then run `/discord-setup` to configure your bot token and channel ID.
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Create a new application and add a bot
 3. Enable the **Message Content** privileged intent in the bot settings
-4. Invite the bot to your server with **Send Messages** and **Read Message History** permissions
+4. Invite the bot to your server with **Send Messages**, **Read Message History**, and **Attach Files** permissions
 5. Copy the bot token and a channel ID for use during `/discord-setup`
 
 ## Usage
@@ -50,6 +51,7 @@ uv run --project /path/to/DiscordSkill discord-notify \
   --title "Optional Title" \
   --color "#5865F2" \
   --fields '[{"name": "Field", "value": "Value", "inline": true}]' \
+  --file /path/to/attachment \
   --wait \
   --timeout 300
 ```

@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import tempfile
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -293,3 +294,135 @@ class TestSendNotification:
         assert result.success is False
         assert result.error is not None
         assert "not a text channel" in result.error
+
+    @pytest.mark.asyncio
+    async def test_send_with_files(
+        self, bot_config: BotConfig, tmp_path: Any
+    ) -> None:
+        # Create temp files to attach
+        file1 = tmp_path / "report.txt"
+        file1.write_text("report content")
+        file2 = tmp_path / "log.txt"
+        file2.write_text("log content")
+
+        request = NotifyRequest(
+            message="Here are the files",
+            files=[str(file1), str(file2)],
+        )
+
+        mock_channel = AsyncMock(spec=discord.TextChannel)
+        sent_files: list[Any] | None = None
+
+        async def capture_send(**kwargs: Any) -> MagicMock:
+            nonlocal sent_files
+            sent_files = kwargs.get("files")
+            msg = MagicMock()
+            msg.id = 101
+            return msg
+
+        mock_channel.send = capture_send  # type: ignore[assignment]
+
+        with patch("discord_bot.client.discord.Client") as MockClient:
+            instance = MockClient.return_value
+            instance.get_channel = MagicMock(return_value=mock_channel)
+            instance.close = AsyncMock()
+            instance._on_ready = None
+
+            def capture_event(func: Any) -> Any:
+                if func.__name__ == "on_ready":
+                    instance._on_ready = func
+                return func
+
+            instance.event = capture_event
+
+            async def fake_start(token: str) -> None:
+                if instance._on_ready:
+                    await instance._on_ready()
+
+            instance.start = AsyncMock(side_effect=fake_start)
+
+            result = await send_notification(bot_config, request)
+
+        assert result.success is True
+        assert result.message_id == 101
+        assert sent_files is not None
+        assert len(sent_files) == 2
+        assert all(isinstance(f, discord.File) for f in sent_files)
+
+    @pytest.mark.asyncio
+    async def test_file_not_found_error(
+        self, bot_config: BotConfig
+    ) -> None:
+        request = NotifyRequest(
+            message="Attach missing file",
+            files=["/nonexistent/path/file.txt"],
+        )
+
+        mock_channel = AsyncMock(spec=discord.TextChannel)
+
+        with patch("discord_bot.client.discord.Client") as MockClient:
+            instance = MockClient.return_value
+            instance.get_channel = MagicMock(return_value=mock_channel)
+            instance.close = AsyncMock()
+            instance._on_ready = None
+
+            def capture_event(func: Any) -> Any:
+                if func.__name__ == "on_ready":
+                    instance._on_ready = func
+                return func
+
+            instance.event = capture_event
+
+            async def fake_start(token: str) -> None:
+                if instance._on_ready:
+                    await instance._on_ready()
+
+            instance.start = AsyncMock(side_effect=fake_start)
+
+            result = await send_notification(bot_config, request)
+
+        assert result.success is False
+        assert result.error is not None
+        assert "File not found" in result.error
+
+    @pytest.mark.asyncio
+    async def test_file_too_large(
+        self, bot_config: BotConfig, tmp_path: Any
+    ) -> None:
+        large_file = tmp_path / "huge.bin"
+        large_file.write_bytes(b"x" * 10)  # Small file, but we lower the limit
+
+        request = NotifyRequest(
+            message="Attach huge file",
+            files=[str(large_file)],
+        )
+
+        mock_channel = AsyncMock(spec=discord.TextChannel)
+
+        with (
+            patch("discord_bot.client.discord.Client") as MockClient,
+            patch("discord_bot.client.MAX_FILE_SIZE", 1),  # 1 byte limit
+        ):
+            instance = MockClient.return_value
+            instance.get_channel = MagicMock(return_value=mock_channel)
+            instance.close = AsyncMock()
+            instance._on_ready = None
+
+            def capture_event(func: Any) -> Any:
+                if func.__name__ == "on_ready":
+                    instance._on_ready = func
+                return func
+
+            instance.event = capture_event
+
+            async def fake_start(token: str) -> None:
+                if instance._on_ready:
+                    await instance._on_ready()
+
+            instance.start = AsyncMock(side_effect=fake_start)
+
+            result = await send_notification(bot_config, request)
+
+        assert result.success is False
+        assert result.error is not None
+        assert "25MB" in result.error
