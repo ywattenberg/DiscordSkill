@@ -20,7 +20,7 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
   --config ".claude/discord-skill.local.md"
 ```
 
-If the user included flags like `--wait`, `--title`, `--fields`, `--file`, or `--timeout` in their arguments, pass them through directly.
+If the user included flags like `--wait`, `--no-wait`, `--title`, `--fields`, `--file`, or `--timeout` in their arguments, pass them through directly.
 
 **IMPORTANT**: When using `--wait`, always set the Bash tool timeout to 600000 (the maximum) so the command is not killed before a reply arrives.
 

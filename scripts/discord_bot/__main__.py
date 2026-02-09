@@ -38,6 +38,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Block and wait for a human response",
     )
     parser.add_argument(
+        "--no-wait",
+        action="store_true",
+        help="Send the message without waiting for a reply (overrides --wait)",
+    )
+    parser.add_argument(
         "--timeout",
         type=int,
         default=300,
@@ -92,13 +97,15 @@ def main() -> None:
             print(resp.model_dump_json())
             sys.exit(1)
 
+    wait = args.wait and not args.no_wait
+
     request = NotifyRequest(
         title=args.title,
         message=args.message,
         color=color,
         fields=fields,
         files=args.files,
-        wait=args.wait,
+        wait=wait,
         timeout=args.timeout,
     )
 
