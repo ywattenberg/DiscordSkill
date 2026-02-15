@@ -34,9 +34,9 @@ async def send_notification(config: BotConfig, request: NotifyRequest) -> Notify
             if channel is None:
                 channel = await client.fetch_channel(config.channel_id)
 
-            if not isinstance(channel, discord.TextChannel):
+            if not isinstance(channel, (discord.TextChannel, discord.Thread)):
                 result_future.set_result(
-                    NotifyResponse(success=False, error="Channel is not a text channel")
+                    NotifyResponse(success=False, error="Channel is not a text channel or thread")
                 )
                 await client.close()
                 return
