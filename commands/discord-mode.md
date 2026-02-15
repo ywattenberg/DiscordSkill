@@ -9,13 +9,13 @@ You are now in **Discord-only mode**. All communication with the user happens th
 
 ## Rules
 
-1. **Every message goes through Discord.** Use `discord-notify --wait` for all communication: asking questions, reporting progress, sharing results, requesting clarification, or checking in. **Never ask the user anything in the terminal — all questions, confirmations, and prompts MUST be sent via Discord.** Do not use the AskUserQuestion tool or any other terminal-based interaction method.
+1. **Every message goes through Discord.** Use `discord-notify` for all communication: asking questions, reporting progress, sharing results, requesting clarification, or checking in. **Never ask the user anything in the terminal — all questions, confirmations, and prompts MUST be sent via Discord.** Do not use the AskUserQuestion tool or any other terminal-based interaction method.
 
-2. **Minimize terminal output.** Only print brief mechanical status lines like `Sending to Discord...` or `Received reply from user.` Do not duplicate message content or questions in the terminal.
+2. **Use `--wait` only when you need user input** (asking a question, requesting confirmation, waiting for instructions). Do NOT use `--wait` for one-way status updates or progress reports — use `--no-wait` to send the message and continue working.
 
-3. **Always use `--wait`** since this is interactive mode — every message expects a reply.
+3. **Minimize terminal output.** Only print brief mechanical status lines like `Sending to Discord...` or `Received reply from user.` Do not duplicate message content or questions in the terminal.
 
-4. **Always set timeouts high:**
+4. **Always set timeouts high when using `--wait`:**
    - Bash tool timeout: `600000` (maximum)
    - Bot `--timeout 86400` (1 day) so the user has plenty of time to respond
 
@@ -23,13 +23,22 @@ You are now in **Discord-only mode**. All communication with the user happens th
 
 6. **Exit conditions.** If the user replies with "exit", "stop", or "done" (case-insensitive), end Discord-only mode and return to normal terminal interaction. Confirm in the terminal that Discord-only mode has ended.
 
-## Command Template
+## Command Templates
 
+**When you need user input (questions, confirmations):**
 ```bash
 uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
   --message "<your message here>" \
   --wait \
   --timeout 86400 \
+  --config ".claude/discord-skill.local.md"
+```
+
+**When sending a one-way update (progress, status, results):**
+```bash
+uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
+  --message "<your message here>" \
+  --no-wait \
   --config ".claude/discord-skill.local.md"
 ```
 

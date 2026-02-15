@@ -23,15 +23,17 @@ uv run --project ${CLAUDE_PLUGIN_ROOT} discord-notify \
   [--fields '[{"name": "Field", "value": "Value", "inline": true}]'] \
   [--file /path/to/file] \
   [--wait] \
+  [--no-wait] \
   [--timeout 300]
 ```
 
-## When to use `--wait`
+## When to use `--wait`, `--no-wait`, or neither
 
 - **With `--wait`**: When you need human input, approval, or a decision before continuing. The bot will block until the user replies in the Discord channel or the timeout expires.
 - **Without `--wait`** (fire-and-forget): For status updates, progress reports, or completion notifications where no reply is needed.
+- **With `--no-wait`**: Explicitly overrides `--wait`. This is useful in contexts where `--wait` is set by default (e.g. discord-mode) but you want to send a one-way message without blocking. `--no-wait` takes precedence over `--wait` when both are present.
 
-**IMPORTANT**: When using `--wait`, you MUST set the Bash tool timeout to 600000 (10 minutes, the maximum). The `--timeout` flag controls how long the bot waits for a Discord reply, but the Bash execution timeout must be at least as long or the command will be killed before a reply arrives. Set `--timeout 86400` (1 day) for the bot and always use `timeout: 600000` on the Bash tool call.
+**IMPORTANT**: When using `--wait` (without `--no-wait`), you MUST set the Bash tool timeout to 600000 (10 minutes, the maximum). The `--timeout` flag controls how long the bot waits for a Discord reply, but the Bash execution timeout must be at least as long or the command will be killed before a reply arrives. Set `--timeout 86400` (1 day) for the bot and always use `timeout: 600000` on the Bash tool call.
 
 ## Parsing the response
 
